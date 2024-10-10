@@ -76,7 +76,7 @@ module.exports = {
         // Create an embed for the transaction result
         const transactionEmbed = new EmbedBuilder()
             .setTitle('💸 Transaction Successful!')
-            .setDescription(`You successfully gave **${amount}** prime coins to ${recipient.username}.`)
+            .setDescription(`You successfully gave **${amount}** prime coins to <@${recipient.id}>.`)
             .setColor(0x00AE86)
             .setTimestamp();
 
