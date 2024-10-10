@@ -25,7 +25,6 @@ module.exports = {
 
             // Read and parse the response stream
             const responseData = await response.body.text();
-            console.log('Response body received:', responseData);
 
             const quoteData = JSON.parse(responseData)[0]; // The API returns an array
 
@@ -33,7 +32,7 @@ module.exports = {
             if (!quoteData || !quoteData.q || !quoteData.a) {
                 console.error('Quote data is missing expected fields:', quoteData);
                 return interaction.editReply('Sorry, I couldn\'t retrieve a valid quote.');
-            }
+            } 
 
             // Create an embed message to display the quote
             console.log('Building embed message...');
