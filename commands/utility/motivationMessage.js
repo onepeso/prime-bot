@@ -13,15 +13,14 @@ module.exports = {
 
             // Make the request to the API
             const response = await request('https://zenquotes.io/api/today');
-            const { statusCode, body } = response;
 
-            if (statusCode !== 200) {
+            if (response.statusCode !== 200) {
                 return interaction.editReply('Sorry, I couldn\'t fetch a quote right now. Try again later.');
             }
 
-            // Parse the API response
-            const responseData = await body.json();
-            const quoteData = responseData[0]; // The API returns an array
+            // Read and parse the response stream
+            const responseData = await response.body.text();
+            const quoteData = JSON.parse(responseData)[0]; // The API returns an array
 
             // Create an embed message to display the quote
             const quoteEmbed = new EmbedBuilder()
