@@ -51,7 +51,7 @@ client.once(Events.ClientReady, async readyClient => {
     }
 
     // Set bot status
-    client.user.setActivity('Your Mom!', { type: ActivityType.Watching });
+    client.user.setActivity('yuzu', { type: ActivityType.Playing });
 });
 
 // Handle interactions
