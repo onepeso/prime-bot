@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, AttachmentBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 
@@ -52,6 +52,9 @@ module.exports = {
         }
 
         // Create an embed for the challenge
+        const imagePath = path.join(__dirname, '../../images/roulette.gif');
+        const imageAttachment = new AttachmentBuilder(imagePath);
+
         const challengeEmbed = new EmbedBuilder()
             .setTitle('🎰 Roulette Challenge!')
             .setDescription(`${opponent.toString()}, you have been challenged by ${interaction.user.toString()} for **${bet} prime coins**!`)
@@ -59,7 +62,7 @@ module.exports = {
             .addFields(
                 { name: 'Instructions', value: 'Click **Accept** or **Reject** within 60 seconds.' }
             )
-            .setThumbnail('https://example.com/roulette_image.png')
+            .setThumbnail('attachment://roulette.gif')
             .setTimestamp();
 
         // Create buttons for accepting or rejecting
@@ -75,8 +78,8 @@ module.exports = {
                     .setStyle(ButtonStyle.Danger)
             );
 
-        // Send the challenge embed with buttons
-        await interaction.reply({ embeds: [challengeEmbed], components: [row] });
+        // Send the challenge embed with buttons and attach the image
+        await interaction.reply({ embeds: [challengeEmbed], components: [row], files: [imageAttachment] });
 
         // Await opponent's button interaction
         const filter = i => i.user.id === opponentId;
@@ -138,7 +141,7 @@ async function startGame(interaction, opponent, bet, balances) {
             { name: `${user.username}'s Balance`, value: `${balances[user.id].balance} prime coins`, inline: true },
             { name: `${opponent.username}'s Balance`, value: `${balances[opponent.id].balance} prime coins`, inline: true }
         )
-        .setThumbnail('https://example.com/roulette_result_image.png')
+        .setThumbnail('https://example.com/roulette_result_image.png') // Adjust this with your actual result image URL
         .setTimestamp();
 
     // Send the result embed
