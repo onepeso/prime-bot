@@ -1,4 +1,4 @@
-const {SlashCommandBuilder, EmbedBuilder} = require('@discordjs/builders');
+const { SlashCommandBuilder, EmbedBuilder } = require('@discordjs/builders');
 const fs = require('fs');
 const path = require('path');
 const balancesFilePath = path.join(__dirname, '../../balances.json');
@@ -7,6 +7,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('leaderboard')
         .setDescription('View the leaderboard of the richest users.'),
+    
     async execute(interaction) {
         // Check if the balances file exists, if not create it
         if (!fs.existsSync(balancesFilePath)) {
@@ -38,11 +39,12 @@ module.exports = {
         for (let i = 0; i < Math.min(sortedBalances.length, 10); i++) {
             const [userId, { balance }] = sortedBalances[i];
             const user = await interaction.guild.members.fetch(userId);
-            leaderboardEmbed.addFields(`${i + 1}. ${user.displayName}`, `Balance: ${balance} prime coins`);
+            leaderboardEmbed.addFields(
+                { name: `${i + 1}. ${user.displayName}`, value: `Balance: ${balance} prime coins`, inline: false }
+            );
         }
 
         // Send the leaderboard embed to the Discord channel
         await interaction.reply({ embeds: [leaderboardEmbed] });
-    }   
-
+    }
 };
