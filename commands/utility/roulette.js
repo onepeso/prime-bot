@@ -62,7 +62,7 @@ module.exports = {
             .addFields(
                 { name: 'Instructions', value: 'Click **Accept** or **Reject** within 60 seconds.' }
             )
-            .setThumbnail('attachment://roulette.gif')
+            .setImage('attachment://roulette.gif')
             .setTimestamp();
 
         // Create buttons for accepting or rejecting
