@@ -7,7 +7,7 @@ const balancesFilePath = path.join(__dirname, '../../balances.json');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('roulette')
-        .setDescription('Play a roulette game against another user.')
+        .setDescription('Play a Russian Roulette game against another user.')
         .addUserOption(option =>
             option.setName('opponent')
                 .setDescription('The user you want to compete against')
@@ -56,7 +56,7 @@ module.exports = {
         const imageAttachment = new AttachmentBuilder(imagePath);
 
         const challengeEmbed = new EmbedBuilder()
-            .setTitle('🎰 Roulette Challenge!')
+            .setTitle('🔫 Russian Roulette Challenge!')
             .setDescription(`${opponent.toString()}, you have been challenged by ${interaction.user.toString()} for **${bet} prime coins**!`)
             .setColor(0x00AE86)
             .addFields(
@@ -105,27 +105,36 @@ module.exports = {
 async function startGame(interaction, opponent, bet, balances) {
     let messages = [];
     const user = interaction.user;
+    const userId = user.id;
+    const opponentId = opponent.id;
 
-    // Simulate the roulette game
-    const drawResult = Math.floor(Math.random() * 38); // Random number between 0 and 37
+    // Set up the revolver with 6 chambers, randomly load 1 bullet
+    const chambers = [0, 0, 0, 0, 0, 1]; // 0 means no bullet, 1 means bullet
+    shuffleArray(chambers); // Shuffle the chambers to randomize the bullet position
 
-    if (drawResult === 0 || drawResult === 37) {
-        messages.push(`The ball lands on **${drawResult === 0 ? '0' : '00'}**... **LOSE!**`);
-        balances[user.id].balance -= bet; // User loses
-        balances[opponent.id].balance += bet; // Opponent wins
-        messages.push(`${opponent.username} wins! ${user.username} loses ${bet} prime coins.`);
-    } else {
-        const playerWin = Math.random() < 0.4865; // 48.65% chance to win
-        if (playerWin) {
-            messages.push(`The ball lands on **${drawResult}**... **WIN!**`);
-            balances[user.id].balance += bet; // User wins
-            balances[opponent.id].balance -= bet; // Opponent loses
-            messages.push(`${user.username} wins! ${opponent.username} loses ${bet} prime coins.`);
+    let turn = 0; // 0 for user, 1 for opponent
+    let bulletFound = false;
+
+    while (!bulletFound) {
+        const currentPlayer = turn === 0 ? user : opponent;
+        const playerId = turn === 0 ? userId : opponentId;
+
+        // Simulate pulling the trigger (get the next chamber)
+        const chamberResult = chambers.pop(); // Get the next chamber from the revolver
+
+        if (chamberResult === 1) {
+            // Bullet found! The current player loses.
+            bulletFound = true;
+            messages.push(`${currentPlayer.username} pulled the trigger and... 💥 **Bullet found!**`);
+            messages.push(`${currentPlayer.username} loses ${bet} prime coins!`);
+
+            // Update balances
+            balances[playerId].balance -= bet;
+            balances[turn === 0 ? opponentId : userId].balance += bet;
         } else {
-            messages.push(`The ball lands on **${drawResult}**... **LOSE!**`);
-            balances[user.id].balance -= bet; // User loses
-            balances[opponent.id].balance += bet; // Opponent wins
-            messages.push(`${opponent.username} wins! ${user.username} loses ${bet} prime coins.`);
+            // No bullet, continue to the next player's turn
+            messages.push(`${currentPlayer.username} pulled the trigger and... 😅 **No bullet**. Passing the gun...`);
+            turn = 1 - turn; // Switch turns
         }
     }
 
@@ -138,16 +147,23 @@ async function startGame(interaction, opponent, bet, balances) {
 
     // Create an embed for the game result
     const resultEmbed = new EmbedBuilder()
-        .setTitle('🎲 Roulette Results')
+        .setTitle('🔫 Russian Roulette Results')
         .setDescription(messages.join('\n'))
         .setColor(0xF1C40F)
         .addFields(
-            { name: `${user.username}'s Balance`, value: `${balances[user.id].balance} prime coins`, inline: true },
-            { name: `${opponent.username}'s Balance`, value: `${balances[opponent.id].balance} prime coins`, inline: true }
+            { name: `${user.username}'s Balance`, value: `${balances[userId].balance} prime coins`, inline: true },
+            { name: `${opponent.username}'s Balance`, value: `${balances[opponentId].balance} prime coins`, inline: true }
         )
-        .setThumbnail('https://example.com/roulette_result_image.png') // Adjust this with your actual result image URL
         .setTimestamp();
 
     // Send the result embed
     await interaction.followUp({ embeds: [resultEmbed] });
+}
+
+// Helper function to shuffle an array (Fisher-Yates algorithm)
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
 }
