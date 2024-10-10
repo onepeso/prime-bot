@@ -38,7 +38,7 @@ module.exports = {
         for (let i = 0; i < Math.min(sortedBalances.length, 10); i++) {
             const [userId, { balance }] = sortedBalances[i];
             const user = await interaction.guild.members.fetch(userId);
-            leaderboardEmbed.addField(`${i + 1}. ${user.displayName}`, `Balance: ${balance} prime coins`);
+            leaderboardEmbed.addFields(`${i + 1}. ${user.displayName}`, `Balance: ${balance} prime coins`);
         }
 
         // Send the leaderboard embed to the Discord channel
