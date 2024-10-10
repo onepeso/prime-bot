@@ -30,7 +30,7 @@ client.once(Events.ClientReady, async readyClient => {
     console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 
     // bot status
-    client.user.setActivity('NO MORE MET!', { type: ActivityType.Playing });
+    client.user.setActivity('Your Mom!', { type: ActivityType.Watching });
 });
 
 
