@@ -5,18 +5,21 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('quote')
         .setDescription('Get a motivational quote of the day.'),
-        
+
     async execute(interaction) {
         try {
+            // Defer the reply to give the bot more time to fetch the quote
+            await interaction.deferReply();
+
             // Make the request to the API
             const response = await request('https://zenquotes.io/api/today');
             const { statusCode, body } = response;
 
             if (statusCode !== 200) {
-                return interaction.reply('Sorry, I couldn\'t fetch a quote right now. Try again later.');
+                return interaction.editReply('Sorry, I couldn\'t fetch a quote right now. Try again later.');
             }
 
-            // Parse the API response (body will be a stream, so we need to read it)
+            // Parse the API response
             const responseData = await body.json();
             const quoteData = responseData[0]; // The API returns an array
 
@@ -28,11 +31,11 @@ module.exports = {
                 .setTimestamp();
 
             // Send the embed to the Discord channel
-            await interaction.reply({ embeds: [quoteEmbed] });
+            await interaction.editReply({ embeds: [quoteEmbed] });
 
         } catch (error) {
             console.error('Error fetching the quote:', error);
-            await interaction.reply('There was an error retrieving the quote. Please try again later.');
+            await interaction.editReply('There was an error retrieving the quote. Please try again later.');
         }
     },
 };
