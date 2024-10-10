@@ -93,21 +93,8 @@ module.exports = {
                 }
             })
             .catch(async () => {
-
-                await interaction.followUp(`${opponent.username} did not respond in time. Challenge expired. Note that the game and this message will be deleted in 5 minutes.`);
-
-                // Delete reject message after 5 minutes.
-                const rejectMessage = await interaction.followUp();
-
-                setTimeout(async () => {
-                    try {
-                        await rejectMessage.delete();
-                    } catch (error) {
-                        console.error("Error deleting reject message:", error);
-                    }
-                }, 30000); // 30 seconds to test first
-
-
+             
+                await interaction.followUp(`${opponent.username} did not respond in time. ⚠️ Challenge expired ⚠️. Note that the original game invite has been deleted.`);
 
                 //Delete message after 60 seconds/1min to avoid spam and clutter
                 const message = await interaction.fetchReply();
