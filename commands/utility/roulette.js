@@ -56,7 +56,7 @@ module.exports = {
         const imageAttachment = new AttachmentBuilder(imagePath);
 
         const challengeEmbed = new EmbedBuilder()
-            .setTitle('## 🎰 Roulette Challenge!')
+            .setTitle('🎰 Roulette Challenge!')
             .setDescription(`${opponent.toString()}, you have been challenged by ${interaction.user.toString()} for **${bet} prime coins**!`)
             .setColor(0x00AE86)
             .addFields(
