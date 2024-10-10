@@ -66,7 +66,7 @@ module.exports = {
 
         // Send direct messages to both giver and recipient
         try {
-            await interaction.user.send(`You have given **${amount}** prime coins to ${recipient.username}.`);
+            await interaction.user.send(`You have given **${amount}** prime coins to ${recipient.username} on the Prime Gamers Server!!💕.`);
             await recipient.send(`You have received **${amount}** prime coins from ${interaction.user.username}.`);
         } catch (error) {
             console.error("Error sending direct messages:", error);
