@@ -31,6 +31,7 @@ for (const folder of commandFolders) {
 // Register slash commands on bot startup
 client.once(Events.ClientReady, async readyClient => {
     console.log(`Ready! Logged in as ${readyClient.user.tag}`);
+	console.log('Loaded commands:', client.commands.map(cmd => cmd.name));
 
     // Register commands with Discord
     const commands = client.commands.map(command => command.data.toJSON()); // Get all command data
