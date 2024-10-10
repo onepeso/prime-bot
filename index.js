@@ -1,7 +1,7 @@
 // Require the necessary discord.js classes
 const fs = require('fs');
 const path = require('node:path');
-const { Client, Events, GatewayIntentBits, Collection } = require('discord.js'); // Added Collection
+const { Client, Events, GatewayIntentBits, Collection, ActivityType } = require('discord.js'); // Added Collection
 const { token } = require('./config.json');
 
 // Create a new client instance
@@ -30,7 +30,7 @@ client.once(Events.ClientReady, async readyClient => {
     console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 
     // bot status
-    client.user.setActivity('Prime 2.0 DAY TWO!', { type: 'PLAYING' });
+    client.user.setActivity('NO MORE MET!', { type: ActivityType.Playing });
 });
 
 
