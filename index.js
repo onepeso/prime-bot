@@ -31,7 +31,7 @@ for (const folder of commandFolders) {
 // When the client is ready
 client.once(Events.ClientReady, async readyClient => {
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-	client.user.setActivity('VET AVAILABLE!', { type: ActivityType.Playing });
+	client.user.setActivity('For Some VTO!', { type: ActivityType.Watching });
 });
 
 // Handle command interactions
