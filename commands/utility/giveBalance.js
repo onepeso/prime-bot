@@ -65,8 +65,13 @@ module.exports = {
         }
 
         // Send direct messages to both giver and recipient
-        const giverDM = await interaction.user.send(`You have given **${amount}** prime coins to ${recipient.username}.`);
-        const recipientDM = await recipient.send(`You have received **${amount}** prime coins from ${interaction.user.username}.`);
+        try {
+            await interaction.user.send(`You have given **${amount}** prime coins to ${recipient.username}.`);
+            await recipient.send(`You have received **${amount}** prime coins from ${interaction.user.username}.`);
+        } catch (error) {
+            console.error("Error sending direct messages:", error);
+            return interaction.reply("Transaction completed, but there was an error sending direct messages.");
+        }
 
         // Create an embed for the transaction result
         const transactionEmbed = new EmbedBuilder()
