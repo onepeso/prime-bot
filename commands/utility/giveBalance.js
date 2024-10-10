@@ -6,7 +6,7 @@ const balancesFilePath = path.join(__dirname, '../../balances.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('givebalance')
+        .setName('give')
         .setDescription('Give prime coins to another user.')
         .addUserOption(option =>
             option.setName('recipient')
