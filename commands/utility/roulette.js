@@ -94,6 +94,10 @@ module.exports = {
             })
             .catch(async () => {
                 await interaction.followUp(`${opponent.username} did not respond in time. Challenge expired.`);
+
+                //Delete message after 60 seconds/1min to avoid spam and clutter
+                const message = await interaction.fetchReply();
+                await message.delete();
             });
     },
 };
