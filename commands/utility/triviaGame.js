@@ -64,7 +64,7 @@ module.exports = {
                 const row = new ActionRowBuilder().addComponents(buttons);
 
                 // Send the question
-                await interaction.reply({ embeds: [embed], components: [row] });
+                const initialReply = await interaction.reply({ embeds: [embed], components: [row], fetchReply: true });
 
                 // Create a button collector to listen for the user's answer
                 const filter = i => i.user.id === userMentioned.id;
