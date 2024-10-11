@@ -14,7 +14,7 @@ module.exports = {
         const userMentioned = interaction.user;
         const apiUrl = `https://the-trivia-api.com/v2/questions/`;
 
-          // Read the balances from the JSON file
+        // Read the balances from the JSON file
         let balances;
         try {
             const data = fs.readFileSync(balancesFilePath);
@@ -41,7 +41,7 @@ module.exports = {
             const allAnswers = [...randomQuestion.incorrectAnswers, randomQuestion.correctAnswer].sort(() => Math.random() - 0.5);
 
             // Create buttons for the answers
-            const buttons = allAnswers.map((answer, index) => 
+            const buttons = allAnswers.map((answer, index) =>
                 new ButtonBuilder()
                     .setCustomId(`answer_${index}`)
                     .setLabel(`${index + 1}. ${answer}`)
@@ -70,7 +70,6 @@ module.exports = {
                 const correctAnswerIndex = allAnswers.indexOf(randomQuestion.correctAnswer);
 
                 if (selectedAnswerIndex === correctAnswerIndex) {
-                    await i.update({ content: `${userMentioned}, you got it right! 🎉 You won `, components: [] });
 
                     // Update the user's balance with the reward
                     const reward = 20; // Reward for answering correctly
@@ -79,7 +78,8 @@ module.exports = {
                     // Write the updated balances to the JSON file
                     fs.writeFileSync(balancesFilePath, JSON.stringify(balances));
 
-                    await interaction.followUp(`You have been awarded ${reward} Prime Coins!`);
+                    await i.update({ content: `${userMentioned}, you got it right! 🎉 You've won ${reward} Prime Coins!`, components: [] });
+
 
                 } else {
                     await i.update({ content: `${userMentioned}, that's incorrect. The correct answer was: ${randomQuestion.correctAnswer}`, components: [] });
