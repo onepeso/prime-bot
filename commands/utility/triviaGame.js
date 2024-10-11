@@ -1,5 +1,9 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { request } = require('undici');
+const fs = require('fs');
+const path = require('path');
+
+const balancesFilePath = path.join(__dirname, '../../balances.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -9,6 +13,16 @@ module.exports = {
     async execute(interaction) {
         const userMentioned = interaction.user;
         const apiUrl = `https://the-trivia-api.com/v2/questions/`;
+
+          // Read the balances from the JSON file
+        let balances;
+        try {
+            const data = fs.readFileSync(balancesFilePath);
+            balances = JSON.parse(data);
+        } catch (error) {
+            console.error("Error reading balances:", error);
+            return interaction.reply("There was an error reading the balances.");
+        }
 
         try {
             // Fetch trivia questions from the API
@@ -57,6 +71,16 @@ module.exports = {
 
                 if (selectedAnswerIndex === correctAnswerIndex) {
                     await i.update({ content: `${userMentioned}, you got it right! 🎉`, components: [] });
+
+                    // Update the user's balance with the reward
+                    const reward = 100; // Reward for answering correctly
+                    balances[userMentioned.id] = { balance: (balances[userMentioned.id]?.balance || 0) + reward };
+
+                    // Write the updated balances to the JSON file
+                    fs.writeFileSync(balancesFilePath, JSON.stringify(balances));
+
+                    await interaction.followUp(`You have been awarded ${reward} Prime Coins!`);
+
                 } else {
                     await i.update({ content: `${userMentioned}, that's incorrect. The correct answer was: ${randomQuestion.correctAnswer}`, components: [] });
                 }
