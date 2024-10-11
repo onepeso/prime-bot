@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { request } = require('undici');
 
 module.exports = {
@@ -23,45 +23,52 @@ module.exports = {
             // Pick a random trivia question
             const randomQuestion = data[Math.floor(Math.random() * data.length)];
 
+            // Shuffle the answers (to ensure the correct answer isn't always last)
+            const allAnswers = [...randomQuestion.incorrectAnswers, randomQuestion.correctAnswer].sort(() => Math.random() - 0.5);
+
+            // Create buttons for the answers
+            const buttons = allAnswers.map((answer, index) => 
+                new ButtonBuilder()
+                    .setCustomId(`answer_${index}`)
+                    .setLabel(`${index + 1}. ${answer}`)
+                    .setStyle(ButtonStyle.Primary)
+            );
+
             // Prepare the embed message
             const embed = new EmbedBuilder()
                 .setColor('#0099ff')
                 .setTitle('Trivia Question!')
                 .setDescription(randomQuestion.question.text)
-                .addFields(
-                    { 
-                        name: 'Choices', 
-                        value: [
-                            ...randomQuestion.incorrectAnswers.map((answer, index) => `${index + 1}. ${answer}`),
-                            `${randomQuestion.incorrectAnswers.length + 1}. ${randomQuestion.correctAnswer}`
-                        ].join('\n') 
-                    }
-                )
-                .setFooter({ text: `Reply with the number of your answer, ${userMentioned.username}!` });
+                .setFooter({ text: `Select the correct answer using the buttons below, ${userMentioned.username}!` });
 
-            await interaction.reply({ embeds: [embed] });
+            // Create a row for the buttons
+            const row = new ActionRowBuilder().addComponents(buttons);
 
-            const filter = response => {
-                const validAnswers = ['1', '2', '3', '4'];
-                return validAnswers.includes(response.content) && response.author.id === userMentioned.id;
-            };
+            // Send the initial interaction reply with the embed and buttons
+            await interaction.reply({ embeds: [embed], components: [row] });
 
-            // Use awaitMessages to collect the user's response
-            const collected = await interaction.channel.awaitMessages({ filter, max: 1, time: 30000 });
+            // Create a button collector to listen for the user's answer
+            const filter = i => i.user.id === userMentioned.id; // Ensure only the user who triggered the command can interact with the buttons
+            const collector = interaction.channel.createMessageComponentCollector({ filter, time: 30000 });
 
-            if (!collected.size) {
-                return interaction.followUp(`${userMentioned}, time's up! You didn't answer in time.`);
-            }
+            collector.on('collect', async i => {
+                const selectedAnswerIndex = parseInt(i.customId.split('_')[1]);
+                const correctAnswerIndex = allAnswers.indexOf(randomQuestion.correctAnswer);
 
-            const response = collected.first();
-            const answerIndex = parseInt(response.content) - 1;
-            const correctIndex = randomQuestion.incorrectAnswers.length; // Correct answer is at the index of incorrectAnswers length
+                if (selectedAnswerIndex === correctAnswerIndex) {
+                    await i.update({ content: `${userMentioned}, you got it right! 🎉`, components: [] });
+                } else {
+                    await i.update({ content: `${userMentioned}, that's incorrect. The correct answer was: ${randomQuestion.correctAnswer}`, components: [] });
+                }
 
-            if (answerIndex === correctIndex) {
-                await interaction.followUp(`${userMentioned}, you got it right! 🎉`);
-            } else {
-                await interaction.followUp(`${userMentioned}, that's incorrect. The correct answer was: ${randomQuestion.correctAnswer}`);
-            }
+                collector.stop(); // Stop the collector after an answer is received
+            });
+
+            collector.on('end', collected => {
+                if (collected.size === 0) {
+                    interaction.editReply({ content: `${userMentioned}, time's up! You didn't answer in time.`, components: [] });
+                }
+            });
 
         } catch (error) {
             console.error('Error fetching trivia questions:', error);
