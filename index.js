@@ -36,7 +36,7 @@ for (const folder of commandFolders) {
 // When the client is ready
 client.once(Events.ClientReady, async readyClient => {
     console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-    client.user.setActivity('Sharks winning!💥', { type: ActivityType.Watching });
+    client.user.setActivity('Sharks Win🦈', { type: ActivityType.Watching });
 });
 
 // Handle command interactions
