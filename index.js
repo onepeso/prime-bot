@@ -23,7 +23,7 @@ for (const folder of commandFolders) {
     const commandsPath = path.join(foldersPath, folder);
     const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
     for (const file of commandFiles) {
-        const filePath = path.join(commandsPath, file);
+        const filePath = path.join(commandsPath, folder, file);
         const command = require(filePath);
         if ('data' in command && 'execute' in command) {
             client.commands.set(command.data.name, command);
@@ -37,6 +37,10 @@ for (const folder of commandFolders) {
 client.once(Events.ClientReady, async readyClient => {
     console.log(`Ready! Logged in as ${readyClient.user.tag}`);
     client.user.setActivity('Sharks Win🦈', { type: ActivityType.Watching });
+
+    // Execute deploy-commands.js
+    const deployCommands = require('./deploy-commands');
+    await deployCommands(clientId, guildId, token);
 });
 
 // Handle command interactions
