@@ -93,18 +93,14 @@ module.exports = {
                 }
             })
             .catch(async () => {
-             
-                await interaction.followUp(`${opponent.username} did not respond in time. ⚠️ Challenge expired ⚠️. Note that the original game invite has been deleted.`);
-
-                //Delete message after 60 seconds/1min to avoid spam and clutter
+                await interaction.followUp(`${opponent.username} did not respond in time. ⚠️ Challenge expired ⚠️`);
                 const message = await interaction.fetchReply();
-                await message.delete();
+                await message.delete(); // Ensure this does not throw an error if already deleted
             });
     },
 };
 
 async function startGame(interaction, opponent, bet, balances) {
-    let messages = [];
     const user = interaction.user;
     const userId = user.id;
     const opponentId = opponent.id;
@@ -120,14 +116,22 @@ async function startGame(interaction, opponent, bet, balances) {
         const currentPlayer = turn === 0 ? user : opponent;
         const playerId = turn === 0 ? userId : opponentId;
 
-        // Prompt the current player to pull the trigger
+        // Create Pull Trigger button
+        const pullRow = new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('pull_trigger')
+                    .setLabel('Pull Trigger')
+                    .setStyle(ButtonStyle.Primary)
+            );
+
         const pullEmbed = new EmbedBuilder()
             .setTitle('🔫 Pull the Trigger!')
             .setDescription(`${currentPlayer.username}, it's your turn to pull the trigger!`)
             .setColor(0x00AE86);
 
-        // Send the pull prompt
-        await interaction.followUp({ embeds: [pullEmbed] });
+        // Send the pull prompt with the pull button
+        await interaction.followUp({ embeds: [pullEmbed], components: [pullRow] });
 
         // Await user's response
         const filter = i => i.user.id === playerId;
@@ -141,23 +145,17 @@ async function startGame(interaction, opponent, bet, balances) {
                 if (chamberResult === 1) {
                     // Bullet found! The current player loses.
                     bulletFound = true;
-                    messages.push(`${currentPlayer.username} pulled the trigger and... 💥 **Bullet found!**`);
-                    messages.push(`${currentPlayer.username} loses ${bet} prime coins!`);
-
-                    // Update balances
+                    const message = `${currentPlayer.username} pulled the trigger and... 💥 **Bullet found!**`;
+                    await response.update({ content: message, components: [] });
                     balances[playerId].balance -= bet;
                     balances[turn === 0 ? opponentId : userId].balance += bet;
                 } else {
                     // No bullet, continue to the next player's turn
-                    messages.push(`${currentPlayer.username} pulled the trigger and... 😅 **No bullet**. Passing the gun...`);
+                    await response.update({ content: `${currentPlayer.username} pulled the trigger and... 😅 **No bullet**. Passing the gun...`, components: [] });
                     turn = 1 - turn; // Switch turns
                 }
-
-                // Update the response message
-                await response.update({ content: `${currentPlayer.username} pulled the trigger!`, components: [] });
             }
         } catch (error) {
-            // Handle timeout or other errors
             await interaction.followUp(`${currentPlayer.username} did not respond in time. Game over!`);
             return;
         }
@@ -173,7 +171,7 @@ async function startGame(interaction, opponent, bet, balances) {
     // Create an embed for the game result
     const resultEmbed = new EmbedBuilder()
         .setTitle('🔫 Russian Roulette Results')
-        .setDescription(messages.join('\n'))
+        .setDescription(`${user.username} lost ${bet} prime coins!`)
         .setColor(0xF1C40F)
         .addFields(
             { name: `${user.username}'s Balance`, value: `${balances[userId].balance} prime coins`, inline: true },
@@ -184,7 +182,6 @@ async function startGame(interaction, opponent, bet, balances) {
     // Send the result embed
     await interaction.followUp({ embeds: [resultEmbed] });
 }
-
 
 // Helper function to shuffle an array (Fisher-Yates algorithm)
 function shuffleArray(array) {
