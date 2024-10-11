@@ -31,7 +31,7 @@ module.exports = {
 
             // Check if data is not empty
             if (data.length === 0) {
-                return interaction.followUp('No trivia questions available at the moment. Please try again later.');
+                return interaction.followUp('❌ No trivia questions available at the moment. Please try again later.');
             }
 
             // Pick a random trivia question
@@ -51,7 +51,7 @@ module.exports = {
             // Prepare the embed message
             const embed = new EmbedBuilder()
                 .setColor('#0099ff')
-                .setTitle('Trivia Question!')
+                .setTitle('🧠Trivia Question!')
                 .setDescription(randomQuestion.question.text)
                 .setFooter({ text: `Select the correct answer using the buttons below, ${userMentioned.username}!` });
 
