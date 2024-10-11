@@ -39,7 +39,7 @@ for (const folder of commandFolders) {
 // When the client is ready
 client.once(Events.ClientReady, async readyClient => {
     console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-    client.user.setActivity('2Pac - California Love', { type: ActivityType.Listening });
+    client.user.setActivity('Mood: 😁Happy!', { type: ActivityType.Custom });
 
     // Deploy commands
     await deployCommands(clientId, guildId, token); // Pass the required parameters
