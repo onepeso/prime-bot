@@ -13,7 +13,6 @@ module.exports = {
             const { body } = await request(apiUrl);
             const data = await body.json();
             await interaction.followUp(data.insult);
-            console.log(data.insult);
         } catch (error) {
             console.error('Error fetching insult:', error);
             await interaction.followUp('There was an error retrieving the insult. Please try again later.');
