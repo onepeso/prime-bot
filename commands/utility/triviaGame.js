@@ -8,7 +8,6 @@ module.exports = {
 
     async execute(interaction) {
         const userMentioned = interaction.user;
-
         const apiUrl = `https://the-trivia-api.com/v2/questions/`;
 
         try {
@@ -42,32 +41,28 @@ module.exports = {
 
             await interaction.reply({ embeds: [embed] });
 
-            // Set up a message collector to get the user's answer
             const filter = response => {
                 const validAnswers = ['1', '2', '3', '4'];
                 return validAnswers.includes(response.content) && response.author.id === userMentioned.id;
             };
 
-            const collector = interaction.channel.createMessageCollector({ filter, time: 30000 });
+            // Use awaitMessages to collect the user's response
+            const collected = await interaction.channel.awaitMessages({ filter, max: 1, time: 30000 });
 
-            collector.on('collect', async response => {
-                const answerIndex = parseInt(response.content) - 1;
-                const correctIndex = randomQuestion.incorrectAnswers.length; // Correct answer is at index of incorrectAnswers length
+            if (!collected.size) {
+                return interaction.followUp(`${userMentioned}, time's up! You didn't answer in time.`);
+            }
 
-                if (answerIndex === correctIndex) {
-                    await interaction.followUp(`${userMentioned}, you got it right! 🎉`);
-                } else {
-                    await interaction.followUp(`${userMentioned}, that's incorrect. The correct answer was: ${randomQuestion.correctAnswer}`);
-                }
+            const response = collected.first();
+            const answerIndex = parseInt(response.content) - 1;
+            const correctIndex = randomQuestion.incorrectAnswers.length; // Correct answer is at the index of incorrectAnswers length
 
-                collector.stop(); // Stop the collector after an answer is received
-            });
+            if (answerIndex === correctIndex) {
+                await interaction.followUp(`${userMentioned}, you got it right! 🎉`);
+            } else {
+                await interaction.followUp(`${userMentioned}, that's incorrect. The correct answer was: ${randomQuestion.correctAnswer}`);
+            }
 
-            collector.on('end', collected => {
-                if (collected.size === 0) {
-                    interaction.followUp(`${userMentioned}, time's up! You didn't answer in time.`);
-                }
-            });
         } catch (error) {
             console.error('Error fetching trivia questions:', error);
             await interaction.followUp('There was an error retrieving trivia questions. Please try again later.');
