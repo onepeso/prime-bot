@@ -36,11 +36,7 @@ for (const folder of commandFolders) {
 // When the client is ready
 client.once(Events.ClientReady, async readyClient => {
     console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-    client.user.setActivity('Sharks Win🦈', { type: ActivityType.Watching });
-
-    // Execute deploy-commands.js
-    const deployCommands = require('./deploy-commands');
-    await deployCommands(client); // Assuming deploy-commands.js exports a function that takes client as an argument
+    client.user.setActivity('Sharks Win 🦈', { type: ActivityType.Watching });
 });
 
 // Handle command interactions
