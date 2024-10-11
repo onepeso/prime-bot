@@ -23,7 +23,7 @@ for (const folder of commandFolders) {
     const commandsPath = path.join(foldersPath, folder);
     const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
     for (const file of commandFiles) {
-        const filePath = path.join(commandsPath, folder, file);
+        const filePath = path.join(commandsPath, file);
         const command = require(filePath);
         if ('data' in command && 'execute' in command) {
             client.commands.set(command.data.name, command);
@@ -40,7 +40,7 @@ client.once(Events.ClientReady, async readyClient => {
 
     // Execute deploy-commands.js
     const deployCommands = require('./deploy-commands');
-    await deployCommands(clientId, guildId, token);
+    await deployCommands(client); // Assuming deploy-commands.js exports a function that takes client as an argument
 });
 
 // Handle command interactions
