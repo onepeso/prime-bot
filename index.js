@@ -4,6 +4,9 @@ const fs = require('fs');
 const path = require('node:path');
 const { Client, Events, GatewayIntentBits, Collection, ActivityType } = require('discord.js');
 
+// Import the deployCommands function
+const deployCommands = require('./deploy-commands'); // Adjust the path if necessary
+
 // Get the token, clientId, and guildId from environment variables
 const token = process.env.DISCORD_TOKEN;
 const clientId = process.env.CLIENT_ID;
@@ -37,6 +40,9 @@ for (const folder of commandFolders) {
 client.once(Events.ClientReady, async readyClient => {
     console.log(`Ready! Logged in as ${readyClient.user.tag}`);
     client.user.setActivity('Sharks Win 🦈', { type: ActivityType.Watching });
+
+    // Deploy commands
+    await deployCommands(clientId, guildId, token); // Pass the required parameters
 });
 
 // Handle command interactions
