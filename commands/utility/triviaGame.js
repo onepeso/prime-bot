@@ -14,6 +14,9 @@ module.exports = {
         const userMentioned = interaction.user;
         const apiUrl = `https://the-trivia-api.com/v2/questions/`;
 
+        // Defer the reply to ensure we have more time to fetch data
+        await interaction.deferReply();
+
         // Read the balances from the JSON file
         let balances;
         try {
@@ -21,7 +24,7 @@ module.exports = {
             balances = JSON.parse(data);
         } catch (error) {
             console.error("Error reading balances:", error);
-            return interaction.reply("There was an error reading the balances.");
+            return interaction.editReply("There was an error reading the balances.");
         }
 
         try {
@@ -31,7 +34,7 @@ module.exports = {
 
             // Check if data is not empty
             if (data.length === 0) {
-                return interaction.followUp('❌ No trivia questions available at the moment. Please try again later.');
+                return interaction.editReply('❌ No trivia questions available at the moment. Please try again later.');
             }
 
             // Pick a random trivia question
@@ -58,8 +61,8 @@ module.exports = {
             // Create a row for the buttons
             const row = new ActionRowBuilder().addComponents(buttons);
 
-            // Send the initial interaction reply with the embed and buttons
-            await interaction.reply({ embeds: [embed], components: [row] });
+            // Send the interaction reply with the embed and buttons
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
             // Create a button collector to listen for the user's answer
             const filter = i => i.user.id === userMentioned.id; // Ensure only the user who triggered the command can interact with the buttons
@@ -80,9 +83,6 @@ module.exports = {
 
                     await i.update({ content: `${userMentioned}, you got it right! 🎉 You won ${reward}💵`, components: [] });
 
-
-
-
                 } else {
                     await i.update({ content: `${userMentioned}, that's incorrect. The correct answer was: ${randomQuestion.correctAnswer}`, components: [] });
                 }
@@ -98,7 +98,7 @@ module.exports = {
 
         } catch (error) {
             console.error('Error fetching trivia questions:', error);
-            await interaction.followUp('There was an error retrieving trivia questions. Please try again later.');
+            await interaction.editReply('There was an error retrieving trivia questions. Please try again later.');
         }
     },
 };
