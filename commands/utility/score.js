@@ -13,7 +13,7 @@ function getTodayDate() {
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('shark')
-        .setDescription('Get live score for Sharks vs Blues game'),
+        .setDescription('Get live score for Sharks NHL games!'),
     
     async execute(interaction) {
         // Dynamically get today's date for the API query
