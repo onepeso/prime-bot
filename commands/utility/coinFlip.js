@@ -3,6 +3,8 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 
+const balancesFilePath = path.join(__dirname, '../../balances.json');
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('coinflip')
@@ -11,20 +13,41 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
 
-        // Start the game, providing the interaction and logic for buttons
-        startGame(interaction);
+        // Check if the balances file exists, if not create it
+        if (!fs.existsSync(balancesFilePath)) {
+            fs.writeFileSync(balancesFilePath, JSON.stringify({}));
+        }
+
+        // Read the balances from the JSON file
+        let balances;
+        try {
+            const data = fs.readFileSync(balancesFilePath);
+            balances = JSON.parse(data);
+        } catch (error) {
+            console.error("Error reading balances:", error);
+            return interaction.reply("There was an error retrieving your balance.");
+        }
+
+        // Initialize player's balance if they don't have one
+        if (!balances[interaction.user.id]) {
+            balances[interaction.user.id] = { balance: 0 }; // Start with 0 coins
+        }
+
+        // Start the game
+        startGame(interaction, balances);
     },
 };
 
 // The function to initiate the game with UI and buttons
-async function startGame(interaction, bet, balances) {
+async function startGame(interaction, balances) {
     // Embed message to show game information
     const coinFlipGameEmbed = new EmbedBuilder()
         .setTitle('🪙 Coin Flip Game 🪙')
         .setColor('#ff8800')
         .setDescription('Pick either Heads or Tails and test your luck!')
         .addFields(
-            { name: 'Instructions', value: 'Pick a side: Heads or Tails. The coin will flip, and we will see if you guessed correctly!' }
+            { name: 'Instructions', value: 'Pick a side: Heads or Tails. The coin will flip, and we will see if you guessed correctly!' },
+            { name: 'Your Balance', value: `${balances[interaction.user.id].balance} coins` } // Show player balance
         )
         .setImage('attachment://coinflip.gif'); // Example of attaching a gif
 
@@ -33,26 +56,25 @@ async function startGame(interaction, bet, balances) {
         new ButtonBuilder()
             .setCustomId('heads')
             .setLabel('Heads')
-            .setStyle('PRIMARY'),
+            .setStyle('Primary'),
         new ButtonBuilder()
             .setCustomId('tails')
             .setLabel('Tails')
-            .setStyle('PRIMARY')
+            .setStyle('Primary')
     );
 
     // Path to the coin flip gif (make sure this image exists in your assets)
-    const imageAttachment = { attachment: path.join(__dirname, '../images/coinflip.gif'), name: 'coinflip.gif' };
+    const imageAttachment = { attachment: path.join(__dirname, '../../images/coinflip.gif'), name: 'coinflip.gif' };
 
     // Send the embed and buttons to the user
     await interaction.editReply({ embeds: [coinFlipGameEmbed], components: [row], files: [imageAttachment] });
 
     // Proceed to game logic when user clicks a button
-    handleGameLogic(interaction);
+    handleGameLogic(interaction, balances);
 }
 
 // Function to handle the game logic and button interactions
-function handleGameLogic(interaction) {
-    // Create a message component collector to capture the user's button choice
+function handleGameLogic(interaction, balances) {
     const filter = (btnInteraction) => {
         return ['heads', 'tails'].includes(btnInteraction.customId) && btnInteraction.user.id === interaction.user.id;
     };
@@ -63,18 +85,16 @@ function handleGameLogic(interaction) {
     });
 
     collector.on('collect', async (btnInteraction) => {
-        // Randomly decide the coin flip result (0 = heads, 1 = tails)
         const coin = Math.floor(Math.random() * 2);
         const coinResult = coin === 0 ? 'heads' : 'tails';
-
-        // Check if player's choice matches the coin flip result
-        const playerChoice = btnInteraction.customId; // Either 'heads' or 'tails'
+        const playerChoice = btnInteraction.customId;
         let resultMessage = '';
 
         if (playerChoice === coinResult) {
-            resultMessage = `🎉 Congratulations! The coin landed on **${coinResult.toUpperCase()}**. You guessed it right!`;
+            balances[btnInteraction.user.id].balance += 5; // Add 5 coins for a win
+            resultMessage = `🎉 Congratulations! The coin landed on **${coinResult.toUpperCase()}**. You guessed it right! You now have ${balances[btnInteraction.user.id].balance} coins.`;
         } else {
-            resultMessage = `😢 Sorry, the coin landed on **${coinResult.toUpperCase()}**. Better luck next time!`;
+            resultMessage = `😢 Sorry, the coin landed on **${coinResult.toUpperCase()}**. Better luck next time! You still have ${balances[btnInteraction.user.id].balance} coins.`;
         }
 
         // Disable buttons after a selection is made
@@ -82,12 +102,12 @@ function handleGameLogic(interaction) {
             new ButtonBuilder()
                 .setCustomId('heads')
                 .setLabel('Heads')
-                .setStyle('PRIMARY')
+                .setStyle('Primary')
                 .setDisabled(true),
             new ButtonBuilder()
                 .setCustomId('tails')
                 .setLabel('Tails')
-                .setStyle('PRIMARY')
+                .setStyle('Primary')
                 .setDisabled(true)
         );
 
@@ -96,6 +116,9 @@ function handleGameLogic(interaction) {
             content: resultMessage,
             components: [disabledRow],
         });
+
+        // Write updated balances back to the file
+        fs.writeFileSync(balancesFilePath, JSON.stringify(balances, null, 2));
 
         collector.stop(); // Stop the collector after interaction
     });

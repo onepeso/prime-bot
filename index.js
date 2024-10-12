@@ -39,7 +39,7 @@ for (const folder of commandFolders) {
 // When the client is ready
 client.once(Events.ClientReady, async readyClient => {
     console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-    client.user.setActivity('⚠️ still being developed!', { type: ActivityType.Custom });
+    client.user.setActivity('Working on Roulette Game!', { type: ActivityType.Custom });
 
     // Deploy commands
     await deployCommands(clientId, guildId, token); // Pass the required parameters

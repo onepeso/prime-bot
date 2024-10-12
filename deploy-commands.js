@@ -3,9 +3,21 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const deployCommands = async (clientId, guildId, token) => {
-    const commands = []; // Ensure this is declared
+    const commands = [];
+    const rest = new REST().setToken(token);
 
-    // Grab all the command folders from the commands directory
+    // Optional: Fetch and delete existing commands
+    try {
+        const existingCommands = await rest.get(Routes.applicationGuildCommands(clientId, guildId));
+        for (const command of existingCommands) {
+            await rest.delete(Routes.applicationCommand(clientId, guildId, command.id));
+            console.log(`Deleted command: ${command.name}`);
+        }
+    } catch (error) {
+        console.error(`Error deleting existing commands: ${error}`);
+    }
+
+    // Load new commands (the rest of your existing code)
     const foldersPath = path.join(__dirname, 'commands');
     const commandFolders = fs.readdirSync(foldersPath);
 
@@ -25,9 +37,6 @@ const deployCommands = async (clientId, guildId, token) => {
         }
     }
 
-    // Construct and prepare an instance of the REST module
-    const rest = new REST().setToken(token);
-
     // Deploy your commands
     try {
         console.log(`Started refreshing ${commands.length} application (/) commands.`);
@@ -42,5 +51,4 @@ const deployCommands = async (clientId, guildId, token) => {
         console.error(error);
     }
 };
-
 module.exports = deployCommands;
