@@ -3,14 +3,13 @@ const { request } = require('undici');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('test')
-        .setDescription('Test Command Nothing Useful'),
+        .setName('annoybot')
+        .setDescription('Use this command to annoy the bot. You might get an insult back!'),
 
     async execute(interaction) {
 
         const userMentioned = interaction.user;
         
-        await interaction.reply('Test Command! Seeing if something works.');
         const apiUrl = `https://evilinsult.com/generate_insult.php?lang=en&type=json`;
         try {
             const { body } = await request(apiUrl);
