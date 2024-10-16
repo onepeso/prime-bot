@@ -3,7 +3,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const fs = require('fs');
 const path = require('path');
 
-const movieNightFilePath = path.join(__dirname, 'movienight.json');
+const movieNightFilePath = path.join(__dirname, '../../movienight.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
