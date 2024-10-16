@@ -13,7 +13,7 @@ module.exports = {
     async execute(interaction) {
         // Read the movie night details from the JSON file
         const imagePath = path.join(__dirname, '../../images/saw.webp');
-         const imageAttachment = new AttachmentBuilder(imagePath);
+        const imageAttachment = new AttachmentBuilder(imagePath);
         let movieNight;
         try {
             const data = fs.readFileSync(movieNightFilePath, 'utf8');
@@ -77,15 +77,16 @@ module.exports = {
                 // Update the embed with the new attendees list
                 const updatedAttendees = movieNight.attendees.join(', ');
                 const updatedEmbed = new EmbedBuilder()
-                    .setTitle('Movie Night')
-                    .setDescription('Here are the details for the next movie night!')
+                    .setTitle(`🍿 ${movieNight.name} Movie Night! `)
+                    .setDescription('Get the popcorn ready! Here are the details for the next movie night:')
                     .addFields(
-                        { name: 'Movie', value: movieNight.movie || 'TBD', inline: true },
+                        { name: 'Movie', value: movieNight.name || 'TBD', inline: true },
                         { name: 'Date', value: movieNight.date || 'TBD', inline: true },
                         { name: 'Time', value: movieNight.time || 'TBD', inline: true },
                         { name: 'Attendees', value: updatedAttendees, inline: false }
                     )
-                    .setColor('#00FF00');
+                    .setColor('#00FF00')
+                    .setImage('attachment://saw.webp');
 
                 await message.edit({ embeds: [updatedEmbed] });
                 await i.reply({ content: 'You have been added to the attendees list!', ephemeral: true });
