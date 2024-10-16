@@ -12,6 +12,8 @@ module.exports = {
 
     async execute(interaction) {
         // Read the movie night details from the JSON file
+        const imagePath = path.join(__dirname, '../../images/roulette.gif');
+         const imageAttachment = new AttachmentBuilder(imagePath);
         let movieNight;
         try {
             const data = fs.readFileSync(movieNightFilePath, 'utf8');
@@ -37,7 +39,7 @@ module.exports = {
                 { name: 'Attendees', value: attendees, inline: false }
             )
             .setColor('#00FF00')
-            .setImage('../../images/saw.webp');
+            .setImage('attachment://saw.webp');
 
         // Create a button
         const row = new ActionRowBuilder().addComponents(
