@@ -31,9 +31,9 @@ module.exports = {
             .setTitle('Movie Night')
             .setDescription('Here are the details for the next movie night!')
             .addFields(
-                { name: 'Movie', value: movieNight.movie, inline: true },
-                { name: 'Date', value: movieNight.date, inline: true },
-                { name: 'Time', value: movieNight.time, inline: true },
+                { name: 'Movie', value: movieNight.movie || 'TBD', inline: true },
+                { name: 'Date', value: movieNight.date || 'TBD', inline: true },
+                { name: 'Time', value: movieNight.time || 'TBD', inline: true },
                 { name: 'Attendees', value: attendees, inline: false }
             )
             .setColor('#00FF00');
