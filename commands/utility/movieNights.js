@@ -50,7 +50,7 @@ module.exports = {
         );
 
         // Reply with the embed and button
-        const message = await interaction.reply({ embeds: [challengeEmbed], components: [row], files: [imageAttachment] });
+        const message = await interaction.reply({ embeds: [embed], components: [row], files: [imageAttachment] });
 
         // Create a collector to handle button interactions
         const filter = i => i.customId === 'attend';
