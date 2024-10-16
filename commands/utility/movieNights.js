@@ -28,15 +28,16 @@ module.exports = {
 
         // Create an embed with the movie night details
         const embed = new EmbedBuilder()
-            .setTitle('Movie Night')
-            .setDescription('Here are the details for the next movie night!')
+            .setTitle(`🍿${movieNight.movie} Movie Night🍿`)
+            .setDescription('Get the popcorn ready! Here are the details for the next movie night:')
             .addFields(
                 { name: 'Movie', value: movieNight.movie || 'TBD', inline: true },
                 { name: 'Date', value: movieNight.date || 'TBD', inline: true },
                 { name: 'Time', value: movieNight.time || 'TBD', inline: true },
                 { name: 'Attendees', value: attendees, inline: false }
             )
-            .setColor('#00FF00');
+            .setColor('#00FF00')
+            .setImage('../../images/saw.webp');
 
         // Create a button
         const row = new ActionRowBuilder().addComponents(
