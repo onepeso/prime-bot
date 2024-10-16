@@ -30,10 +30,10 @@ module.exports = {
 
         // Create an embed with the movie night details
         const embed = new EmbedBuilder()
-            .setTitle(`🍿${movieNight.movie} Movie Night🍿`)
+            .setTitle(`🍿${movieNight.name} Movie Night🍿`)
             .setDescription('Get the popcorn ready! Here are the details for the next movie night:')
             .addFields(
-                { name: 'Movie', value: movieNight.movie || 'TBD', inline: true },
+                { name: 'Movie', value: movieNight.name || 'TBD', inline: true },
                 { name: 'Date', value: movieNight.date || 'TBD', inline: true },
                 { name: 'Time', value: movieNight.time || 'TBD', inline: true },
                 { name: 'Attendees', value: attendees, inline: false }
@@ -50,7 +50,7 @@ module.exports = {
         );
 
         // Reply with the embed and button
-        const message = await interaction.reply({ embeds: [embed], components: [row], fetchReply: true });
+        const message = await interaction.reply({ embeds: [challengeEmbed], components: [row], files: [imageAttachment] });
 
         // Create a collector to handle button interactions
         const filter = i => i.customId === 'attend';
