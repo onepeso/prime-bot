@@ -47,11 +47,11 @@ module.exports = {
         );
 
         // Reply with the embed and button
-        await interaction.reply({ embeds: [embed], components: [row] });
+        const message = await interaction.reply({ embeds: [embed], components: [row], fetchReply: true });
 
         // Create a collector to handle button interactions
-        const filter = i => i.customId === 'attend' && i.user.id === interaction.user.id;
-        const collector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
+        const filter = i => i.customId === 'attend';
+        const collector = message.createMessageComponentCollector({ filter, time: 60000 });
 
         collector.on('collect', async i => {
             if (i.customId === 'attend') {
@@ -71,6 +71,20 @@ module.exports = {
                     return i.reply("There was an error updating the movie night details.");
                 }
 
+                // Update the embed with the new attendees list
+                const updatedAttendees = movieNight.attendees.join(', ');
+                const updatedEmbed = new EmbedBuilder()
+                    .setTitle('Movie Night')
+                    .setDescription('Here are the details for the next movie night!')
+                    .addFields(
+                        { name: 'Movie', value: movieNight.movie || 'TBD', inline: true },
+                        { name: 'Date', value: movieNight.date || 'TBD', inline: true },
+                        { name: 'Time', value: movieNight.time || 'TBD', inline: true },
+                        { name: 'Attendees', value: updatedAttendees, inline: false }
+                    )
+                    .setColor('#00FF00');
+
+                await message.edit({ embeds: [updatedEmbed] });
                 await i.reply({ content: 'You have been added to the attendees list!', ephemeral: true });
             }
         });
