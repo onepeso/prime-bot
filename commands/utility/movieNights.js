@@ -12,7 +12,7 @@ module.exports = {
 
     async execute(interaction) {
         // Read the movie night details from the JSON file
-        const imagePath = path.join(__dirname, '../../images/roulette.gif');
+        const imagePath = path.join(__dirname, '../../images/saw.webp');
          const imageAttachment = new AttachmentBuilder(imagePath);
         let movieNight;
         try {
@@ -30,7 +30,7 @@ module.exports = {
 
         // Create an embed with the movie night details
         const embed = new EmbedBuilder()
-            .setTitle(`🍿${movieNight.name} Movie Night🍿`)
+            .setTitle(`🍿 ${movieNight.name} Movie Night! `)
             .setDescription('Get the popcorn ready! Here are the details for the next movie night:')
             .addFields(
                 { name: 'Movie', value: movieNight.name || 'TBD', inline: true },
